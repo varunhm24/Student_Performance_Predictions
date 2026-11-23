@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Prediction</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button, .nav-link {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e0f2fe;
+            border-radius: 7px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Student Performance Prediction System</h1>
+
+    <p>Enter student details to predict academic performance.</p>
+
+    <div class="navigation">
+        <a class="nav-link" href="{{ url_for('home') }}">Prediction</a>
+        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav-link" href="{{ url_for('history') }}">History</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('home') }}">
+
+        <label>Student ID</label>
+        <input type="text" name="student_id" required>
+
+        <label>Study Hours</label>
+        <input type="number" name="study_hours" step="0.1" min="0" required>
+
+        <label>Attendance (%)</label>
+        <input type="number" name="attendance" step="0.1" min="0" max="100" required>
+
+        <label>Previous Marks</label>
+        <input type="number" name="previous_marks" step="0.1" min="0" max="100" required>
+
+        <label>Assignments</label>
+        <input type="number" name="assignments" step="0.1" min="0" required>
+
+        <label>Internal Marks</label>
+        <input type="number" name="internal_marks" step="0.1" min="0" max="100" required>
+
+        <button type="submit">Predict Performance</button>
+
+    </form>
+
+    {% if prediction %}
+    <div class="result">
+        <h2>Prediction: {{ prediction }}</h2>
+        <p>{{ message }}</p>
+    </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

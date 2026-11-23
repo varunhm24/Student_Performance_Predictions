@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Prediction History</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters input,
+        .filters select {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .pass {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #dc2626;
+        }
+
+        .nav-links {
+            margin-top: 25px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Student Prediction History</h1>
+
+    <!-- Search and Filter -->
+    <div class="filters">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by Student ID..."
+        >
+
+        <select id="resultFilter">
+
+            <option value="all">All Students</option>
+
+            <option value="pass">Passed Students</option>
+
+            <option value="fail">Failed Students</option>
+
+        </select>
+
+    </div>
+
+    <!-- Prediction History Table -->
+    <table id="historyTable">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student ID</th>
+                <th>Study Hours</th>
+                <th>Attendance</th>
+                <th>Previous Marks</th>
+                <th>Assignments</th>
+                <th>Internal Marks</th>
+                <th>Prediction</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for student in predictions %}
+
+            <tr>
+
+                <td>{{ student['id'] }}</td>
+
+                <td>{{ student['student_id'] }}</td>
+
+                <td>{{ student['study_hours'] }}</td>
+
+                <td>{{ student['attendance'] }}</td>
+
+                <td>{{ student['previous_marks'] }}</td>
+
+                <td>{{ student['assignments'] }}</td>
+
+                <td>{{ student['internal_marks'] }}</td>
+
+                <td class="{{ 'pass' if student['prediction'] == 'Pass' else 'fail' }}">
+                    {{ student['prediction'] }}
+                </td>
+
+                <td>{{ student['created_at'] }}</td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="9" class="empty">
+                    No prediction records available.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div id="noResults" class="no-results">
+        No matching student records found.
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-links">
+
+        <a href="{{ url_for('home') }}">
+            Back to Prediction
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+<!-- Search and Filter JavaScript -->
+<script>
+
+    const searchInput = document.getElementById("searchInput");
+
+    const resultFilter = document.getElementById("resultFilter");
+
+    const tableRows = document.querySelectorAll(
+        "#historyTable tbody tr"
+    );
+
+    const noResults = document.getElementById("noResults");
+
+    function filterHistory() {
+
+        const searchValue = searchInput.value.trim().toLowerCase();
+
+        const filterValue = resultFilter.value;
+
+        let visibleCount = 0;
+
+        tableRows.forEach(function(row) {
+
+            const studentIdCell = row.cells[1];
+
+            const predictionCell = row.cells[7];
+
+            // Ignore the empty-history message row
+            if (!studentIdCell || !predictionCell) {
+                return;
+            }
+
+            const studentId =
+                studentIdCell.textContent.trim().toLowerCase();
+
+            const prediction =
+                predictionCell.textContent.trim().toLowerCase();
+
+            const matchesSearch =
+                studentId.includes(searchValue);
+
+            const matchesFilter =
+                filterValue === "all" ||
+                prediction === filterValue;
+
+            if (matchesSearch && matchesFilter) {
+
+                row.style.display = "";
+
+                visibleCount++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+        noResults.style.display =
+            visibleCount === 0 &&
+            tableRows.length > 0 &&
+            tableRows[0].cells.length > 1
+                ? "block"
+                : "none";
+    }
+
+    searchInput.addEventListener("input", filterHistory);
+
+    resultFilter.addEventListener("change", filterHistory);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Performance Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 15px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1d4ed8;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .number {
+            font-size: 34px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .blue {
+            color: #2563eb;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+
+        .red {
+            color: #dc2626;
+        }
+
+        .section {
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .bar-row {
+            margin: 22px 0;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .bar-background {
+            background: #e2e8f0;
+            height: 18px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .pass-bar {
+            height: 18px;
+            background: #16a34a;
+        }
+
+        .fail-bar {
+            height: 18px;
+            background: #dc2626;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        th {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .pass-text {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .fail-text {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .empty {
+            color: #64748b;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .buttons a {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .buttons a:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Student Performance Dashboard</h1>
+
+    <p class="subtitle">
+        Overview of machine learning prediction results
+    </p>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Students Evaluated</h3>
+            <div class="number blue">{{ total }}</div>
+        </div>
+
+        <div class="card">
+            <h3>Predicted Pass</h3>
+            <div class="number green">{{ pass_count }}</div>
+        </div>
+
+        <div class="card">
+            <h3>Predicted Fail</h3>
+            <div class="number red">{{ fail_count }}</div>
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Prediction Distribution</h2>
+
+        <div class="bar-row">
+
+            <div class="bar-label">
+                <span>Pass</span>
+                <span>{{ "%.1f"|format(pass_percentage) }}%</span>
+            </div>
+
+            <div class="bar-background">
+                <div class="pass-bar"
+                     style="width: {{ pass_percentage }}%;">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bar-row">
+
+            <div class="bar-label">
+                <span>Fail</span>
+                <span>{{ "%.1f"|format(fail_percentage) }}%</span>
+            </div>
+
+            <div class="bar-background">
+                <div class="fail-bar"
+                     style="width: {{ fail_percentage }}%;">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Recent Predictions</h2>
+
+        {% if recent_predictions %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Study Hours</th>
+                        <th>Attendance</th>
+                        <th>Previous Marks</th>
+                        <th>Prediction</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for student in recent_predictions %}
+
+                    <tr>
+                        <td>{{ student["id"] }}</td>
+                        <td>{{ student["study_hours"] }}</td>
+                        <td>{{ student["attendance"] }}%</td>
+                        <td>{{ student["previous_marks"] }}</td>
+
+                        <td class="{{ 'pass-text' if student['prediction'] == 'Pass' else 'fail-text' }}">
+                            {{ student["prediction"] }}
+                        </td>
+
+                        <td>{{ student["created_at"] }}</td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p class="empty">No predictions available yet.</p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="buttons">
+        <a href="/">New Prediction</a>
+        <a href="/history">View Prediction History</a>
+    </div>
+
+</div>
+
+</body>
+</html>

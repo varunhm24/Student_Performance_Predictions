@@ -1,0 +1,153 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Prediction History</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            padding: 25px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #1d4ed8;
+            text-align: center;
+        }
+
+        .count {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        th {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .pass {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        a:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Student Prediction History</h1>
+
+    <p class="count">
+        Total Predictions: {{ predictions|length }}
+    </p>
+
+    {% if predictions %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Study Hours</th>
+                <th>Attendance</th>
+                <th>Previous Marks</th>
+                <th>Assignments</th>
+                <th>Internal Marks</th>
+                <th>Prediction</th>
+                <th>Date and Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for student in predictions %}
+            <tr>
+                <td>{{ student["id"] }}</td>
+                <td>{{ student["study_hours"] }}</td>
+                <td>{{ student["attendance"] }}%</td>
+                <td>{{ student["previous_marks"] }}</td>
+                <td>{{ student["assignments"] }}</td>
+                <td>{{ student["internal_marks"] }}</td>
+
+                <td class="{{ 'pass' if student['prediction'] == 'Pass' else 'fail' }}">
+                    {{ student["prediction"] }}
+                </td>
+
+                <td>{{ student["created_at"] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <p class="empty">No prediction records found.</p>
+
+    {% endif %}
+
+    <a href="/">Back to Prediction Page</a>
+
+    <a href="/dashboard">View Dashboard</a>
+
+    <a href="/export">Download Excel CSV</a>
+
+
+</div>
+
+</body>
+</html>
